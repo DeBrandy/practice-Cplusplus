@@ -1,0 +1,42 @@
+题目：241. 为运算表达式设计优先级
+给定一个含有数字和运算符的字符串，为表达式添加括号，改变其运算优先级以求出不同的结果。你需要给出所有可能的组合的结果。有效的运算符号包含 +, - 以及 * 。
+
+示例 1:
+输入: "2-1-1"
+输出: [0, 2]
+解释: 
+((2-1)-1) = 0 
+(2-(1-1)) = 2
+
+解答：
+class Solution {
+public:
+    vector<int> diffWaysToCompute(string expression) {
+        vector<int> vec1, vec2, res;
+        int n = expression.size();
+        int flag = 0;
+        for(int i=0; i<n; i++){
+            if(expression[i] == '+' || expression[i] == '-' || expression[i] == '*'){
+                flag = 1; // flag=1说明string是表达式，flag=0说明string是一个数字
+                vec1 = diffWaysToCompute(string(expression, 0, i)); // 从第0个开始，存i个字符
+                vec2 = diffWaysToCompute(string(expression, i+1, n-i-1)); 
+                for(int v1:vec1){
+                    for(int v2:vec2){
+                        if(expression[i] == '+') res.push_back(v1+v2);
+                        if(expression[i] == '-') res.push_back(v1-v2);
+                        if(expression[i] == '*') res.push_back(v1*v2);
+                    }
+                }
+            }
+        }
+        if(flag==0) return {std::stoi(expression)};
+        return res;
+    }
+};
+
+总结：
+以每一个符号为中心考虑，所谓的优先级，就是计算这个符号左右两端的式子
+分治算法三步走：
+分解：按运算符分成左右两部分，分别求解
+解决：实现一个递归函数，输入算式，返回算式解
+合并：根据运算符合并左右两部分的解，得出最终解。
